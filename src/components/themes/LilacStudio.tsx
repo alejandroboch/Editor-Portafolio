@@ -1,7 +1,9 @@
 import type { Portfolio } from "@/lib/types";
 import { projectHasContent } from "@/lib/portfolio";
 import { PhotoCollection } from "./PhotoGallery";
+import { Reveal } from "./Reveal";
 import {
+  ProfilePhoto,
   SectionLabel,
   firstProjectImage,
   initialsOf,
@@ -115,10 +117,10 @@ export function LilacStudio({
           />
           <div className="relative overflow-hidden rounded-full border-[10px] border-white shadow-[0_25px_60px_rgba(124,107,196,.18)]">
             {profile.photo ? (
-              <img
+              <ProfilePhoto
                 src={profile.photo}
                 alt={displayName}
-                className="aspect-square w-full object-cover"
+                shape="circle"
               />
             ) : (
               <div className="flex aspect-square items-center justify-center bg-violet-100 text-violet-400">
@@ -229,8 +231,8 @@ export function LilacStudio({
             visibleProjects.map((project, index) => {
               const notes = projectNotes(project);
               return (
+              <Reveal key={project.id} delay={index * 70}>
               <article
-                key={project.id}
                 className="grid overflow-hidden rounded-[2rem] bg-white shadow-[0_18px_40px_rgba(124,107,196,.1)] lg:grid-cols-12"
               >
                 <div className={`p-6 lg:col-span-4 ${index % 2 ? "lg:order-2" : ""}`}>
@@ -271,6 +273,7 @@ export function LilacStudio({
                   />
                 </div>
               </article>
+              </Reveal>
               );
             })
           )}

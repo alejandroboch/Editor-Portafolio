@@ -1,7 +1,9 @@
 import type { Portfolio } from "@/lib/types";
 import { projectHasContent } from "@/lib/portfolio";
 import { PhotoCollection, DevicePreview } from "./PhotoGallery";
+import { Reveal } from "./Reveal";
 import {
+  ProfilePhoto,
   SectionLabel,
   initialsOf,
   projectImages,
@@ -89,25 +91,18 @@ export function VioletNight({
             energía
           </span>
           {profile.photo ? (
-            <div className="relative mx-auto max-w-[280px]">
+            <Reveal className="relative mx-auto max-w-[260px]">
               <div
                 className="absolute inset-8 rounded-full blur-3xl"
                 style={{ background: withAlpha(accent, 0.55) }}
               />
-              <img
+              <ProfilePhoto
                 src={profile.photo}
                 alt={displayName}
-                className="relative z-[1] w-full object-contain"
-                style={{
-                  filter: "grayscale(0.35) contrast(1.12) saturate(0.85)",
-                  mixBlendMode: "screen",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, black 76%, transparent 100%)",
-                  maskImage:
-                    "linear-gradient(to bottom, black 76%, transparent 100%)",
-                }}
+                shape="portrait"
+                className="relative z-[1] max-h-[420px]"
               />
-            </div>
+            </Reveal>
           ) : (
             <div
               className="flex h-64 items-end justify-center rounded-[2rem] border border-white/10"
@@ -227,9 +222,9 @@ export function VioletNight({
             visibleProjects.map((project, index) => {
               const notes = projectNotes(project);
               return (
+              <Reveal key={project.id} delay={index * 70}>
               <article
-                key={project.id}
-                className="grid items-center gap-6 rounded-[2rem] border border-white/10 bg-black/30 p-5 lg:grid-cols-12"
+                className="grid items-start gap-6 rounded-[2rem] border border-white/10 bg-black/30 p-5 lg:grid-cols-12"
               >
                 <div className={`lg:col-span-4 ${index % 2 ? "lg:order-2" : ""}`}>
                   <SectionLabel>{project.year || "Proyecto"}</SectionLabel>
@@ -265,10 +260,11 @@ export function VioletNight({
                     photoStyle={appearance.photoStyle}
                     accent={accent}
                     alt={project.title}
-                    layout={index % 2 ? "overlap" : "mosaic"}
+                    layout={index % 2 ? "bento" : "mosaic"}
                   />
                 </div>
               </article>
+              </Reveal>
               );
             })
           )}

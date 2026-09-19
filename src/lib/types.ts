@@ -20,6 +20,7 @@ export type PortfolioImage = {
   id: string;
   src: string;
   name?: string;
+  stage?: StageKey;
 };
 
 export type ProjectStage = {

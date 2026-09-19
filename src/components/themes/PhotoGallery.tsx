@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
-import type { PhotoStyle, PortfolioImage } from "@/lib/types";
-import { withAlpha } from "./media";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { STAGE_META, type PhotoStyle, type PortfolioImage, type StageKey } from "@/lib/types";
+import { stageLabel, withAlpha } from "./media";
 
-export type GalleryLayout =
-  | "magazine"
-  | "mosaic"
-  | "overlap"
-  | "bento"
-  | "scatter"
-  | "board";
+export type GalleryLayout = "magazine" | "mosaic" | "bento" | "board" | "fan";
 
 function frameClass(style: PhotoStyle) {
   switch (style) {
@@ -28,49 +22,37 @@ function frameClass(style: PhotoStyle) {
 }
 
 function magazineSpan(index: number, total: number) {
-  if (total === 1) return "col-span-4 row-span-2 min-h-[240px]";
-  if (total === 2) {
-    return index === 0
-      ? "col-span-2 row-span-2 min-h-[240px]"
-      : "col-span-2 row-span-2 min-h-[240px]";
-  }
+  if (total === 1) return "col-span-4 row-span-2 min-h-[200px]";
+  if (total === 2) return "col-span-2 row-span-2 min-h-[180px]";
   const map = [
-    "col-span-2 row-span-2 min-h-[240px]",
-    "col-span-1 row-span-1 min-h-[115px]",
-    "col-span-1 row-span-2 min-h-[240px]",
-    "col-span-1 row-span-1 min-h-[115px]",
-    "col-span-2 row-span-1 min-h-[130px]",
-    "col-span-1 row-span-1 min-h-[115px]",
-    "col-span-1 row-span-1 min-h-[115px]",
-    "col-span-2 row-span-1 min-h-[130px]",
+    "col-span-2 row-span-2 min-h-[200px]",
+    "col-span-1 row-span-1 min-h-[100px]",
+    "col-span-1 row-span-2 min-h-[200px]",
+    "col-span-1 row-span-1 min-h-[100px]",
+    "col-span-2 row-span-1 min-h-[120px]",
   ];
   return map[index % map.length];
 }
 
 function mosaicSpan(index: number) {
   const map = [
-    "col-span-2 row-span-2 min-h-[200px]",
-    "col-span-1 min-h-[96px]",
-    "col-span-1 min-h-[96px]",
-    "col-span-1 min-h-[96px]",
-    "col-span-2 min-h-[140px]",
-    "col-span-1 min-h-[96px]",
+    "col-span-2 row-span-2 min-h-[180px]",
+    "col-span-1 min-h-[90px]",
+    "col-span-1 min-h-[90px]",
+    "col-span-2 min-h-[120px]",
   ];
   return map[index % map.length];
 }
 
 function bentoSpan(index: number) {
-  if (index === 0) return "col-span-2 row-span-2 min-h-[220px]";
-  return "col-span-1 min-h-[105px]";
+  if (index === 0) return "col-span-2 row-span-2 min-h-[180px]";
+  return "col-span-1 min-h-[96px]";
 }
 
 function boardSpan(index: number) {
   const map = [
-    "col-span-2 min-h-[160px]",
-    "col-span-1 min-h-[160px]",
-    "col-span-1 min-h-[160px]",
-    "col-span-1 min-h-[140px]",
     "col-span-2 min-h-[140px]",
+    "col-span-1 min-h-[140px]",
     "col-span-1 min-h-[140px]",
   ];
   return map[index % map.length];
@@ -90,6 +72,7 @@ function Lightbox({
   onIndex: (value: number) => void;
 }) {
   const active = images[index];
+  const label = stageLabel(active.stage);
   return (
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-black/85 p-4"
@@ -129,12 +112,18 @@ function Lightbox({
           </button>
         </>
       ) : null}
-      <img
-        src={active.src}
-        alt={alt}
-        className="max-h-[88vh] max-w-[92vw] rounded-lg object-contain"
-        onClick={(event) => event.stopPropagation()}
-      />
+      <div className="max-w-[92vw]" onClick={(event) => event.stopPropagation()}>
+        {label ? (
+          <p className="mb-2 text-center text-xs uppercase tracking-[0.22em] text-white/70">
+            {label}
+          </p>
+        ) : null}
+        <img
+          src={active.src}
+          alt={alt}
+          className="max-h-[82vh] max-w-[92vw] rounded-lg object-contain"
+        />
+      </div>
     </div>
   );
 }
@@ -146,6 +135,7 @@ export function PhotoCollection({
   className = "",
   alt = "Proyecto",
   layout = "magazine",
+  groupByStage = true,
 }: {
   images: PortfolioImage[];
   photoStyle: PhotoStyle;
@@ -153,9 +143,11 @@ export function PhotoCollection({
   className?: string;
   alt?: string;
   layout?: GalleryLayout;
+  groupByStage?: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const visible = images.slice(0, 10);
+  const visible = images.slice(0, 12);
+  const flat = useMemo(() => visible, [visible]);
 
   useEffect(() => {
     if (openIndex === null) return;
@@ -163,40 +155,68 @@ export function PhotoCollection({
       if (event.key === "Escape") setOpenIndex(null);
       if (event.key === "ArrowRight") {
         setOpenIndex((current) =>
-          current === null ? current : (current + 1) % visible.length,
+          current === null ? current : (current + 1) % flat.length,
         );
       }
       if (event.key === "ArrowLeft") {
         setOpenIndex((current) =>
           current === null
             ? current
-            : (current - 1 + visible.length) % visible.length,
+            : (current - 1 + flat.length) % flat.length,
         );
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [openIndex, visible.length]);
+  }, [openIndex, flat.length]);
 
-  if (!visible.length) return null;
+  if (!flat.length) return null;
   const frame = frameClass(photoStyle);
+
+  const groups = groupByStage
+    ? [
+        ...STAGE_META.map((stage) => ({
+          key: stage.key as StageKey | "other",
+          label: stage.label,
+          items: flat
+            .map((image, index) => ({ image, index }))
+            .filter((item) => item.image.stage === stage.key),
+        })).filter((group) => group.items.length),
+        {
+          key: "other" as const,
+          label: "Galería",
+          items: flat
+            .map((image, index) => ({ image, index }))
+            .filter((item) => !item.image.stage),
+        },
+      ].filter((group) => group.items.length)
+    : [
+        {
+          key: "other" as const,
+          label: "",
+          items: flat.map((image, index) => ({ image, index })),
+        },
+      ];
 
   function Thumb({
     image,
     index,
     extraClass = "",
     extraStyle,
+    showBadge = true,
   }: {
     image: PortfolioImage;
     index: number;
     extraClass?: string;
-        extraStyle?: CSSProperties;
+    extraStyle?: CSSProperties;
+    showBadge?: boolean;
   }) {
+    const label = stageLabel(image.stage);
     return (
       <button
         type="button"
         onClick={() => setOpenIndex(index)}
-        className={`group relative overflow-hidden text-left ${frame} ${extraClass}`}
+        className={`group relative overflow-hidden text-left transition duration-500 hover:-translate-y-1 ${frame} ${extraClass}`}
         style={{
           ...(photoStyle === "glow"
             ? { boxShadow: `0 0 22px ${withAlpha(accent, 0.35)}` }
@@ -204,79 +224,87 @@ export function PhotoCollection({
           ...extraStyle,
         }}
       >
-        <img src={image.src} alt={alt} className="h-full w-full object-cover" />
-        <span className="pointer-events-none absolute inset-0 hidden items-end justify-center bg-black/30 pb-2 text-[10px] uppercase tracking-[0.18em] text-white group-hover:flex">
+        <img
+          src={image.src}
+          alt={alt}
+          className="h-full w-full object-cover object-[center_20%] transition duration-700 group-hover:scale-105"
+        />
+        {showBadge && label ? (
+          <span className="absolute left-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white">
+            {label}
+          </span>
+        ) : null}
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-black/55 to-transparent pb-2 pt-6 text-center text-[10px] uppercase tracking-[0.18em] text-white group-hover:block">
           Ampliar
         </span>
       </button>
     );
   }
 
-  if (layout === "overlap" || layout === "scatter") {
-    const rotations = [-8, 7, -4, 10, -11, 5, -6, 8];
-    const positions = [
-      "left-[4%] top-4 w-[42%] h-[70%]",
-      "right-[6%] top-0 w-[38%] h-[58%]",
-      "left-[28%] bottom-2 w-[34%] h-[52%]",
-      "right-[18%] bottom-6 w-[30%] h-[48%]",
-      "left-[8%] bottom-10 w-[24%] h-[40%]",
-      "right-[2%] top-[28%] w-[26%] h-[42%]",
-    ];
-    return (
-      <>
-        <div className={`relative h-[320px] sm:h-[380px] ${className}`}>
-          {visible.slice(0, 6).map((image, index) => (
+  function Grid({
+    items,
+  }: {
+    items: { image: PortfolioImage; index: number }[];
+  }) {
+    if (layout === "fan") {
+      const rotations = [-4, 3, -2, 5, -5, 2];
+      return (
+        <div className="flex flex-wrap justify-center gap-3 py-2">
+          {items.map(({ image, index }, order) => (
             <Thumb
               key={image.id}
               image={image}
               index={index}
-              extraClass={`absolute ${positions[index] || positions[0]}`}
+              extraClass="h-36 w-28 sm:h-40 sm:w-32"
               extraStyle={{
-                transform: `rotate(${rotations[index % rotations.length]}deg)`,
-                zIndex: index + 1,
+                transform: `rotate(${rotations[order % rotations.length]}deg)`,
               }}
             />
           ))}
         </div>
-        {openIndex !== null ? (
-          <Lightbox
-            images={visible}
-            index={openIndex}
-            alt={alt}
-            onClose={() => setOpenIndex(null)}
-            onIndex={setOpenIndex}
-          />
-        ) : null}
-      </>
-    );
-  }
+      );
+    }
 
-  const spanFn =
-    layout === "bento"
-      ? bentoSpan
-      : layout === "board"
-        ? boardSpan
-        : layout === "mosaic"
-          ? mosaicSpan
-          : (index: number) => magazineSpan(index, visible.length);
+    const spanFn =
+      layout === "bento"
+        ? (i: number) => bentoSpan(i)
+        : layout === "board"
+          ? (i: number) => boardSpan(i)
+          : layout === "mosaic"
+            ? (i: number) => mosaicSpan(i)
+            : (i: number) => magazineSpan(i, items.length);
 
-  return (
-    <>
-      <div
-        className={`grid grid-cols-2 gap-2 sm:grid-cols-4 sm:auto-rows-[90px] ${className}`}
-      >
-        {visible.map((image, index) => (
+    return (
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:auto-rows-[80px]">
+        {items.map(({ image, index }, order) => (
           <Thumb
             key={image.id}
             image={image}
             index={index}
-            extraClass={spanFn(index)}
+            extraClass={spanFn(order)}
           />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className={`space-y-4 ${className}`}>
+        {groups.map((group) => (
+          <div key={String(group.key)}>
+            {group.label ? (
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] opacity-70">
+                {group.label}
+              </p>
+            ) : null}
+            <Grid items={group.items} />
+          </div>
         ))}
       </div>
       {openIndex !== null ? (
         <Lightbox
-          images={visible}
+          images={flat}
           index={openIndex}
           alt={alt}
           onClose={() => setOpenIndex(null)}
@@ -305,7 +333,7 @@ export function DevicePreview({
       <img
         src={src}
         alt={alt}
-        className="aspect-[9/16] w-full rounded-[1.4rem] object-cover"
+        className="aspect-[9/16] w-full rounded-[1.4rem] object-cover object-[center_18%]"
       />
     </div>
   );

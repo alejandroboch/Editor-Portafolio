@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { STAGE_META, type Portfolio, type Project } from "@/lib/types";
+import { STAGE_META, type Portfolio, type Project, type StageKey } from "@/lib/types";
 import { hasStageContent } from "@/lib/portfolio";
 
 export function hexToRgb(hex: string) {
@@ -40,11 +40,36 @@ export function firstProjectImage(project: Project) {
 }
 
 export function projectImages(project: Project) {
-  return [
-    ...project.stages.sketches.images,
-    ...project.stages.process.images,
-    ...project.stages.final.images,
-  ];
+  return STAGE_META.flatMap((stage) =>
+    project.stages[stage.key].images.map((image) => ({
+      ...image,
+      stage: stage.key,
+    })),
+  );
+}
+
+export function stageLabel(key?: StageKey) {
+  return STAGE_META.find((stage) => stage.key === key)?.label;
+}
+
+export function ProfilePhoto({
+  src,
+  alt,
+  shape = "portrait",
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  shape?: "circle" | "portrait" | "soft";
+  className?: string;
+}) {
+  const shapeClass =
+    shape === "circle"
+      ? "aspect-square rounded-full object-cover object-[center_18%]"
+      : shape === "soft"
+        ? "aspect-[4/5] rounded-[2rem] object-cover object-[center_18%]"
+        : "aspect-[3/4] w-full object-cover object-[center_18%]";
+  return <img src={src} alt={alt} className={`${shapeClass} ${className}`} />;
 }
 
 export function projectNotes(project: Project) {
