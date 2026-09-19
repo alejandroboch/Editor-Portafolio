@@ -1,28 +1,8 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { STAGE_META, type Portfolio, type Project, type StageKey } from "@/lib/types";
 import { hasStageContent } from "@/lib/portfolio";
 
-export function hexToRgb(hex: string) {
-  const clean = hex.replace("#", "");
-  const full =
-    clean.length === 3
-      ? clean
-          .split("")
-          .map((c) => c + c)
-          .join("")
-      : clean;
-  const n = Number.parseInt(full, 16);
-  return {
-    r: (n >> 16) & 255,
-    g: (n >> 8) & 255,
-    b: n & 255,
-  };
-}
-
-export function withAlpha(hex: string, alpha: number) {
-  const { r, g, b } = hexToRgb(hex);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
+export { themeVars, withAlpha, hexToRgb } from "@/lib/palette";
 
 export function initialsOf(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -67,8 +47,8 @@ export function ProfilePhoto({
     shape === "circle"
       ? "aspect-square rounded-full object-cover object-[center_18%]"
       : shape === "soft"
-        ? "aspect-[4/5] rounded-[2rem] object-cover object-[center_18%]"
-        : "aspect-[3/4] w-full object-cover object-[center_18%]";
+        ? "aspect-[4/5] rounded-[2rem] bg-black/10 object-contain object-center"
+        : "aspect-[3/4] w-full bg-black/10 object-contain object-center";
   return <img src={src} alt={alt} className={`${shapeClass} ${className}`} />;
 }
 
@@ -99,12 +79,4 @@ export function SectionLabel({ children }: { children: ReactNode }) {
       {children}
     </p>
   );
-}
-
-export function themeVars(accent: string): CSSProperties {
-  return {
-    ["--accent" as string]: accent,
-    ["--accent-soft" as string]: withAlpha(accent, 0.16),
-    ["--accent-glow" as string]: withAlpha(accent, 0.38),
-  };
 }

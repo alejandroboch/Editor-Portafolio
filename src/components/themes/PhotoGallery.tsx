@@ -21,41 +21,8 @@ function frameClass(style: PhotoStyle) {
   }
 }
 
-function magazineSpan(index: number, total: number) {
-  if (total === 1) return "col-span-4 row-span-2 min-h-[200px]";
-  if (total === 2) return "col-span-2 row-span-2 min-h-[180px]";
-  const map = [
-    "col-span-2 row-span-2 min-h-[200px]",
-    "col-span-1 row-span-1 min-h-[100px]",
-    "col-span-1 row-span-2 min-h-[200px]",
-    "col-span-1 row-span-1 min-h-[100px]",
-    "col-span-2 row-span-1 min-h-[120px]",
-  ];
-  return map[index % map.length];
-}
-
-function mosaicSpan(index: number) {
-  const map = [
-    "col-span-2 row-span-2 min-h-[180px]",
-    "col-span-1 min-h-[90px]",
-    "col-span-1 min-h-[90px]",
-    "col-span-2 min-h-[120px]",
-  ];
-  return map[index % map.length];
-}
-
-function bentoSpan(index: number) {
-  if (index === 0) return "col-span-2 row-span-2 min-h-[180px]";
-  return "col-span-1 min-h-[96px]";
-}
-
-function boardSpan(index: number) {
-  const map = [
-    "col-span-2 min-h-[140px]",
-    "col-span-1 min-h-[140px]",
-    "col-span-1 min-h-[140px]",
-  ];
-  return map[index % map.length];
+function cellSpan(_layout: GalleryLayout, _index: number, _total: number) {
+  return "aspect-[3/4] w-full";
 }
 
 function Lightbox({
@@ -216,7 +183,7 @@ export function PhotoCollection({
       <button
         type="button"
         onClick={() => setOpenIndex(index)}
-        className={`group relative overflow-hidden text-left transition duration-500 hover:-translate-y-1 ${frame} ${extraClass}`}
+        className={`group relative flex aspect-[3/4] items-center justify-center overflow-hidden bg-black/10 text-left transition duration-500 hover:-translate-y-1 ${frame} ${extraClass}`}
         style={{
           ...(photoStyle === "glow"
             ? { boxShadow: `0 0 22px ${withAlpha(accent, 0.35)}` }
@@ -227,7 +194,7 @@ export function PhotoCollection({
         <img
           src={image.src}
           alt={alt}
-          className="h-full w-full object-cover object-[center_20%] transition duration-700 group-hover:scale-105"
+          className="h-full w-full object-contain transition duration-700 group-hover:scale-[1.03]"
         />
         {showBadge && label ? (
           <span className="absolute left-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white">
@@ -255,7 +222,7 @@ export function PhotoCollection({
               key={image.id}
               image={image}
               index={index}
-              extraClass="h-36 w-28 sm:h-40 sm:w-32"
+              extraClass="aspect-[3/4] w-36 sm:w-40"
               extraStyle={{
                 transform: `rotate(${rotations[order % rotations.length]}deg)`,
               }}
@@ -265,23 +232,14 @@ export function PhotoCollection({
       );
     }
 
-    const spanFn =
-      layout === "bento"
-        ? (i: number) => bentoSpan(i)
-        : layout === "board"
-          ? (i: number) => boardSpan(i)
-          : layout === "mosaic"
-            ? (i: number) => mosaicSpan(i)
-            : (i: number) => magazineSpan(i, items.length);
-
     return (
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:auto-rows-[80px]">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {items.map(({ image, index }, order) => (
           <Thumb
             key={image.id}
             image={image}
             index={index}
-            extraClass={spanFn(order)}
+            extraClass={cellSpan(layout, order, items.length)}
           />
         ))}
       </div>
@@ -333,7 +291,7 @@ export function DevicePreview({
       <img
         src={src}
         alt={alt}
-        className="aspect-[9/16] w-full rounded-[1.4rem] object-cover object-[center_18%]"
+        className="aspect-[9/16] w-full rounded-[1.4rem] bg-black object-contain"
       />
     </div>
   );

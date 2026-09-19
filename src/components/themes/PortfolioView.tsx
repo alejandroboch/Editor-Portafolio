@@ -8,6 +8,7 @@ import {
   SolarPop,
   TealBoard,
 } from "./ExtraThemes";
+import { BurgundyStudio, SocialPress } from "./PressThemes";
 
 export function PortfolioView({
   portfolio,
@@ -29,6 +30,10 @@ export function PortfolioView({
       return <CrimsonAtelier portfolio={portfolio} shareUrl={shareUrl} />;
     case "teal-board":
       return <TealBoard portfolio={portfolio} shareUrl={shareUrl} />;
+    case "social-press":
+      return <SocialPress portfolio={portfolio} shareUrl={shareUrl} />;
+    case "burgundy-studio":
+      return <BurgundyStudio portfolio={portfolio} shareUrl={shareUrl} />;
     default:
       return <LilacStudio portfolio={portfolio} shareUrl={shareUrl} />;
   }

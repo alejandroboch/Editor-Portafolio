@@ -1,5 +1,20 @@
-import { createPortfolio } from "./portfolio";
-import type { Portfolio } from "./types";
+import { createPortfolio, createProject, emptyStage } from "./portfolio";
+import type { Portfolio, Project } from "./types";
+
+function normalizeProject(project: Partial<Project>): Project {
+  const base = createProject();
+  return {
+    ...base,
+    ...project,
+    id: project.id || base.id,
+    docs: Array.isArray(project.docs) ? project.docs : [],
+    stages: {
+      sketches: { ...emptyStage(), ...project.stages?.sketches },
+      process: { ...emptyStage(), ...project.stages?.process },
+      final: { ...emptyStage(), ...project.stages?.final },
+    },
+  };
+}
 
 function mergeDraft(parsed: Partial<Portfolio>): Portfolio {
   const base = createPortfolio();
@@ -14,7 +29,9 @@ function mergeDraft(parsed: Partial<Portfolio>): Portfolio {
       stats: { ...base.profile.stats, ...parsed.profile?.stats },
     },
     appearance: { ...base.appearance, ...parsed.appearance },
-    projects: parsed.projects?.length ? parsed.projects : base.projects,
+    projects: parsed.projects?.length
+      ? parsed.projects.map((project) => normalizeProject(project))
+      : base.projects,
   };
 }
 

@@ -2,6 +2,7 @@ import { STAGE_META, type Portfolio, type Project } from "@/lib/types";
 import { projectHasContent } from "@/lib/portfolio";
 import { PhotoCollection, type GalleryLayout } from "./PhotoGallery";
 import { Reveal } from "./Reveal";
+import { ProjectDocs } from "./ProjectDocs";
 import {
   ProfilePhoto,
   projectImages,
@@ -68,6 +69,7 @@ function Spread({
           <p className="mt-1 text-sm opacity-80">{project.role}</p>
         ) : null}
         <Notes project={project} className={`mt-4 ${noteClass}`} />
+        <ProjectDocs project={project} />
       </div>
       <div className={`p-3 lg:col-span-8 ${reverse ? "lg:order-1" : ""}`}>
         <PhotoCollection
@@ -87,20 +89,16 @@ export function CoastEditorial({ portfolio }: { portfolio: Portfolio; shareUrl?:
   const accent = appearance.accent;
   const visible = projects.filter(projectHasContent);
   const displayName = profile.name || "Tu nombre";
-  const photoPool = visible.flatMap(projectImages);
   const socials = socialEntries(portfolio);
-  const tall = photoPool[0];
-  const stack = photoPool.slice(1, 4);
 
   return (
     <div
       className="coast-editorial min-h-screen text-white"
-      style={{ ...themeVars(accent), background: "#2f6f80" }}
+      style={themeVars(accent, "coast-editorial")}
     >
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-6 px-6 py-4 text-[11px] uppercase tracking-[0.28em]">
         <a href="#casos">Casos</a>
         <a href="#sobre-mi">Sobre mí</a>
-        <a href="#fotos">Fotografía</a>
         <a href="#contacto">Contacto</a>
       </header>
 
@@ -127,34 +125,12 @@ export function CoastEditorial({ portfolio }: { portfolio: Portfolio; shareUrl?:
         </Reveal>
       </section>
 
-      <section
-        id="sobre-mi"
-        className="mx-auto grid max-w-6xl grid-cols-2 gap-3 px-3 py-6 lg:grid-cols-12"
-      >
-        <div className="col-span-2 flex flex-col gap-3 lg:col-span-3">
-          {tall ? (
-            <img src={tall.src} alt="" className="h-64 w-full object-cover lg:h-full" />
-          ) : null}
-          {stack.map((image) => (
-            <img key={image.id} src={image.src} alt="" className="h-28 w-full object-cover" />
-          ))}
-        </div>
-        <div className="col-span-2 bg-[#1f5563] p-6 lg:col-span-4">
+      <section id="sobre-mi" className="mx-auto max-w-6xl px-6 py-6">
+        <div className="p-8" style={{ background: "var(--page-2)" }}>
           <h2 className="font-[family-name:var(--font-playfair)] text-4xl italic">Sobre mí</h2>
-          <p className="mt-4 text-sm leading-7 text-white/85">
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-white/85">
             {profile.bio || "Cuenta tu historia, tu estilo y el tipo de proyectos que buscas."}
           </p>
-        </div>
-        <div id="fotos" className="col-span-2 bg-white p-4 text-[#1f5563] lg:col-span-5">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl">Fotografía</h2>
-          <PhotoCollection
-            images={photoPool.slice(0, 8)}
-            photoStyle="editorial"
-            accent={accent}
-            alt="Fotografía"
-            layout="magazine"
-            className="mt-3"
-          />
         </div>
       </section>
 
@@ -170,17 +146,17 @@ export function CoastEditorial({ portfolio }: { portfolio: Portfolio; shareUrl?:
                 photoStyle="editorial"
                 layout="magazine"
                 reverse={index % 2 === 1}
-                panelClass="bg-white text-[#1f4f5c]"
+                panelClass="bg-[var(--paper)] text-[var(--accent-2)]"
                 titleClass="font-[family-name:var(--font-playfair)] text-3xl"
-                noteClass="text-[#1f4f5c]/80"
+                noteClass="opacity-80"
               />
             </Reveal>
           ))
         )}
       </section>
 
-      <section id="contacto" className="mx-auto grid max-w-6xl grid-cols-1 gap-3 px-3 pb-16 lg:grid-cols-2">
-        <div className="bg-[#1f5563] p-6">
+      <section id="contacto" className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="p-6" style={{ background: "var(--page-2)" }}>
           <h2 className="font-[family-name:var(--font-playfair)] text-3xl italic">Contacto</h2>
           <p className="mt-3 text-sm">
             {profile.email || profile.location || "Añade tu correo para que te escriban."}
@@ -193,9 +169,6 @@ export function CoastEditorial({ portfolio }: { portfolio: Portfolio; shareUrl?:
             ))}
           </div>
         </div>
-        {photoPool[4] ? (
-          <img src={photoPool[4].src} alt="" className="h-48 w-full object-cover object-[center_20%]" />
-        ) : null}
       </section>
     </div>
   );
@@ -206,17 +179,16 @@ export function PolaroidNavy({ portfolio }: { portfolio: Portfolio; shareUrl?: s
   const accent = appearance.accent;
   const visible = projects.filter(projectHasContent);
   const displayName = profile.name || "Tu nombre";
+  const socials = socialEntries(portfolio);
   const stats = [
     { value: profile.stats.years, label: "Años" },
     { value: profile.stats.projects, label: "Proyectos" },
     { value: profile.stats.clients, label: "Clientes" },
     { value: profile.stats.awards, label: "Logros" },
   ].filter((item) => item.value.trim());
-  const mosaic = visible.flatMap(projectImages);
-  const socials = socialEntries(portfolio);
 
   return (
-    <div className="polaroid-navy min-h-screen bg-[#f7f4ee] text-[#16324a]" style={themeVars(accent)}>
+    <div className="polaroid-navy min-h-screen" style={themeVars(accent, "polaroid-navy")}>
       <section className="mx-auto grid max-w-6xl items-center gap-8 px-6 py-8 lg:grid-cols-[1fr_.85fr]">
         <Reveal>
           <h1 className="font-[family-name:var(--font-playfair)] text-5xl leading-[0.9] sm:text-7xl">
@@ -224,7 +196,7 @@ export function PolaroidNavy({ portfolio }: { portfolio: Portfolio; shareUrl?: s
             <br />
             {displayName.split(" ")[0]}
           </h1>
-          <p className="mt-4 text-sm uppercase tracking-[0.28em] text-[#2c5a7a]">
+          <p className="mt-4 text-sm uppercase tracking-[0.28em]" style={{ color: "var(--muted)" }}>
             {profile.role || "Creadora visual"}
             {profile.location ? ` · ${profile.location}` : ""}
           </p>
@@ -238,32 +210,26 @@ export function PolaroidNavy({ portfolio }: { portfolio: Portfolio; shareUrl?: s
               className="shadow-2xl"
             />
           ) : (
-            <div className="aspect-[3/4] bg-[#d9e6ef]" />
+            <div className="aspect-[3/4]" style={{ background: "var(--page-2)" }} />
           )}
         </Reveal>
       </section>
 
       <section id="sobre-mi" className="mx-auto grid max-w-6xl gap-3 px-4 pb-6 lg:grid-cols-12">
-        <div className="bg-white p-6 lg:col-span-4">
+        <div className="p-6 lg:col-span-8" style={{ background: "var(--paper)" }}>
           <h2 className="font-[family-name:var(--font-playfair)] text-3xl">Sobre mí</h2>
-          <p className="mt-3 text-sm leading-7 text-[#16324a]/80">
+          <p className="mt-3 max-w-2xl text-sm leading-7 opacity-80">
             {profile.bio || "Presenta tu voz, tu nicho y cómo trabajas con marcas o clientes."}
           </p>
         </div>
-        <div className="bg-[#1b3d57] p-4 text-white lg:col-span-5">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-white/60">Contenido</p>
-          <PhotoCollection
-            images={mosaic.slice(0, 6)}
-            photoStyle="polaroid"
-            accent={accent}
-            alt="Contenido"
-            layout="fan"
-          />
-        </div>
         {stats.length ? (
-          <div className="grid grid-cols-2 gap-2 lg:col-span-3">
+          <div className="grid grid-cols-2 gap-2 lg:col-span-4">
             {stats.map((item) => (
-              <div key={item.label} className="bg-[#1b3d57] p-4 text-center text-white">
+              <div
+                key={item.label}
+                className="p-4 text-center"
+                style={{ background: "var(--accent-2)", color: "var(--paper)" }}
+              >
                 <p className="text-2xl font-semibold">{item.value}</p>
                 <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/70">
                   {item.label}
@@ -283,16 +249,16 @@ export function PolaroidNavy({ portfolio }: { portfolio: Portfolio; shareUrl?: s
               photoStyle="polaroid"
               layout="fan"
               reverse={index % 2 === 1}
-              panelClass={index % 2 ? "bg-[#1b3d57] text-white" : "bg-white"}
+              panelClass={index % 2 ? "bg-[var(--accent-2)] text-[var(--paper)]" : "bg-[var(--paper)]"}
               titleClass="font-[family-name:var(--font-playfair)] text-3xl"
-              noteClass={index % 2 ? "text-white/80" : "text-[#16324a]/80"}
+              noteClass="opacity-80"
             />
           </Reveal>
         ))}
       </section>
 
       <section id="contacto" className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="flex flex-wrap gap-4 bg-[#1b3d57] p-6 text-white">
+        <div className="flex flex-wrap gap-4 p-6" style={{ background: "var(--accent-2)", color: "var(--paper)" }}>
           {socials.map((item) => (
             <a key={item.label} href={item.href} className="underline">
               {item.label}
@@ -319,13 +285,7 @@ export function SolarPop({ portfolio }: { portfolio: Portfolio; shareUrl?: strin
   const socials = socialEntries(portfolio);
 
   return (
-    <div
-      className="solar-pop relative min-h-screen overflow-hidden text-[#3b2418]"
-      style={{
-        ...themeVars(accent),
-        background: "#fff6ec",
-      }}
-    >
+    <div className="solar-pop relative min-h-screen overflow-hidden" style={themeVars(accent, "solar-pop")}>
       <div
         className="pointer-events-none absolute -right-16 top-10 h-64 w-64 rounded-full"
         style={{ background: withAlpha(accent, 0.25) }}
@@ -383,7 +343,7 @@ export function SolarPop({ portfolio }: { portfolio: Portfolio; shareUrl?: strin
       <section id="sobre-mi" className="relative mx-auto grid max-w-6xl gap-4 px-6 pb-8 lg:grid-cols-[1.4fr_.6fr]">
         <div className="rounded-[2.2rem] bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold">Hola, soy {displayName}.</h2>
-          <p className="mt-3 text-sm leading-7 text-[#3b2418]/75">
+          <p className="mt-3 text-sm leading-7 opacity-75">
             {profile.bio || "Cuenta cómo diseñas marcas y por qué tu proceso se siente distinto."}
           </p>
         </div>
@@ -430,8 +390,9 @@ export function SolarPop({ portfolio }: { portfolio: Portfolio; shareUrl?: strin
               />
               <Notes
                 project={project}
-                className={`mt-3 ${index % 2 === 0 ? "text-white/85" : "text-[#3b2418]/75"}`}
+                className={`mt-3 ${index % 2 === 0 ? "text-white/85" : "opacity-75"}`}
               />
+              <ProjectDocs project={project} />
             </article>
             </Reveal>
           ))}
@@ -464,16 +425,13 @@ export function CrimsonAtelier({ portfolio }: { portfolio: Portfolio; shareUrl?:
   const others = visible.slice(1);
 
   return (
-    <div
-      className="crimson-atelier min-h-screen text-[#f3d6a5]"
-      style={{ ...themeVars(accent), background: "#3d0b14" }}
-    >
+    <div className="crimson-atelier min-h-screen" style={themeVars(accent, "crimson-atelier")}>
       <section className="relative mx-auto grid max-w-6xl items-end gap-6 px-6 py-8 lg:grid-cols-2">
         <Reveal>
           <p className="font-[family-name:var(--font-cormorant)] text-6xl leading-none sm:text-8xl">
             Portafolio
           </p>
-          <p className="mt-4 text-sm uppercase tracking-[0.35em] text-[#f3d6a5]/70">
+          <p className="mt-4 text-sm uppercase tracking-[0.35em] opacity-70">
             {profile.role || "Diseño UX UI web"} · {displayName}
           </p>
         </Reveal>
@@ -492,13 +450,13 @@ export function CrimsonAtelier({ portfolio }: { portfolio: Portfolio; shareUrl?:
       </section>
 
       <section id="sobre-mi" className="mx-auto grid max-w-6xl gap-3 px-4 pb-6 lg:grid-cols-12">
-        <div className="border border-[#f3d6a5]/20 p-6 lg:col-span-5">
+        <div className="border p-6 lg:col-span-7" style={{ borderColor: "var(--accent-soft)" }}>
           <h2 className="font-[family-name:var(--font-cormorant)] text-3xl">¿Quién soy?</h2>
-          <p className="mt-3 text-sm leading-7 text-[#f3d6a5]/80">
+          <p className="mt-3 text-sm leading-7 opacity-80">
             {profile.bio || "Habla de tu camino, tu estilo visual y cómo acompañas a cada cliente."}
           </p>
         </div>
-        <div className="border border-[#f3d6a5]/20 p-6 lg:col-span-3">
+        <div className="border p-6 lg:col-span-5" style={{ borderColor: "var(--accent-soft)" }}>
           <h2 className="font-[family-name:var(--font-cormorant)] text-2xl">Etapas</h2>
           <ol className="mt-4 space-y-2 text-sm">
             {STAGE_META.map((stage, index) => (
@@ -508,25 +466,14 @@ export function CrimsonAtelier({ portfolio }: { portfolio: Portfolio; shareUrl?:
             ))}
           </ol>
         </div>
-        {first ? (
-          <div className="border border-[#f3d6a5]/20 p-3 lg:col-span-4">
-            <p className="px-2 text-xs uppercase tracking-[0.2em] opacity-70">Destacado</p>
-            <PhotoCollection
-              images={projectImages(first)}
-              photoStyle="glow"
-              accent={accent}
-              alt={first.title}
-              layout="mosaic"
-            />
-          </div>
-        ) : null}
       </section>
 
       <section id="trabajo" className="mx-auto grid max-w-6xl gap-3 px-4 pb-8 md:grid-cols-2">
         {(first ? [first, ...others] : others).map((project, index) => (
           <article
             key={project.id}
-            className={`border border-[#f3d6a5]/20 p-4 ${index === 0 ? "md:col-span-2" : ""}`}
+            className={`border p-4 ${index === 0 ? "md:col-span-2" : ""}`}
+            style={{ borderColor: "var(--accent-soft)" }}
           >
             <h3 className="mb-3 font-[family-name:var(--font-cormorant)] text-3xl">
               {project.title || "Sin título"}
@@ -538,12 +485,13 @@ export function CrimsonAtelier({ portfolio }: { portfolio: Portfolio; shareUrl?:
               alt={project.title}
               layout={index === 0 ? "magazine" : "mosaic"}
             />
-            <Notes project={project} className="mt-3 text-[#f3d6a5]/80" />
+            <Notes project={project} className="mt-3 opacity-80" />
+            <ProjectDocs project={project} />
           </article>
         ))}
       </section>
 
-      <section id="contacto" className="mx-auto grid max-w-6xl items-center gap-6 px-6 pb-16 lg:grid-cols-2">
+      <section id="contacto" className="mx-auto max-w-6xl px-6 pb-16">
         <div>
           <h2 className="font-[family-name:var(--font-cormorant)] text-4xl">Colaboración</h2>
           <p className="mt-3 max-w-md text-sm leading-7">
@@ -557,14 +505,6 @@ export function CrimsonAtelier({ portfolio }: { portfolio: Portfolio; shareUrl?:
             ))}
           </div>
         </div>
-        {profile.photo ? (
-          <ProfilePhoto
-            src={profile.photo}
-            alt=""
-            shape="circle"
-            className="mx-auto h-40 w-40"
-          />
-        ) : null}
       </section>
     </div>
   );
@@ -575,15 +515,11 @@ export function TealBoard({ portfolio }: { portfolio: Portfolio; shareUrl?: stri
   const accent = appearance.accent;
   const visible = projects.filter(projectHasContent);
   const displayName = profile.name || "Tu nombre";
-  const mosaic = visible.flatMap(projectImages);
 
   return (
-    <div
-      className="teal-board min-h-screen px-4 py-8 text-[#e8f3f4]"
-      style={{ ...themeVars(accent), background: "#d7d2c8" }}
-    >
+    <div className="teal-board min-h-screen px-4 py-8" style={themeVars(accent, "teal-board")}>
       <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-6">
-        <article className="grid items-center gap-4 overflow-hidden rounded-md p-6 md:col-span-4 md:grid-cols-[1.2fr_.8fr]" style={{ background: "#174956" }}>
+        <article className="grid items-center gap-4 overflow-hidden rounded-md p-6 md:col-span-4 md:grid-cols-[1.2fr_.8fr]" style={{ background: "var(--accent-2)", color: "var(--paper)" }}>
           <div>
             <p className="text-xs uppercase tracking-[0.4em] text-white/60">
               {profile.role || "Ilustración y diseño gráfico"}
@@ -602,22 +538,11 @@ export function TealBoard({ portfolio }: { portfolio: Portfolio; shareUrl?: stri
             />
           ) : null}
         </article>
-        <article className="rounded-md p-5 md:col-span-2" style={{ background: "#1f5d6b" }}>
+        <article className="rounded-md p-5 md:col-span-2" style={{ background: "var(--page-2)", color: "var(--paper)" }}>
           <h2 className="text-xs uppercase tracking-[0.3em]">Introducción</h2>
           <p className="mt-3 text-sm leading-7 text-white/85">
             {profile.bio || "Presenta tu enfoque como ilustradora o diseñadora gráfica."}
           </p>
-        </article>
-
-        <article className="rounded-md p-3 md:col-span-3" style={{ background: "#174956" }}>
-          <p className="px-2 pb-2 text-xs uppercase tracking-[0.3em]">Galería</p>
-          <PhotoCollection
-            images={mosaic.slice(0, 8)}
-            photoStyle="editorial"
-            accent={accent}
-            alt="Galería"
-            layout="board"
-          />
         </article>
 
         {visible.map((project, index) => (
@@ -628,7 +553,7 @@ export function TealBoard({ portfolio }: { portfolio: Portfolio; shareUrl?: stri
           >
           <article
             className="rounded-md p-4"
-            style={{ background: index % 2 ? "#1f5d6b" : "#174956" }}
+            style={{ background: index % 2 ? "var(--page-2)" : "var(--accent-2)", color: "var(--paper)" }}
           >
             <h3 className="mb-3 font-[family-name:var(--font-bebas)] text-3xl tracking-[0.1em]">
               {project.title || "Proyecto"}
@@ -641,6 +566,7 @@ export function TealBoard({ portfolio }: { portfolio: Portfolio; shareUrl?: stri
               layout="board"
             />
             <Notes project={project} className="mt-3 text-white/80" />
+            <ProjectDocs project={project} />
           </article>
           </Reveal>
         ))}

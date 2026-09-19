@@ -5,7 +5,9 @@ export type ThemeId =
   | "polaroid-navy"
   | "solar-pop"
   | "crimson-atelier"
-  | "teal-board";
+  | "teal-board"
+  | "social-press"
+  | "burgundy-studio";
 
 export type PhotoStyle =
   | "glow"
@@ -28,12 +30,19 @@ export type ProjectStage = {
   images: PortfolioImage[];
 };
 
+export type ProjectDoc = {
+  id: string;
+  src: string;
+  name: string;
+};
+
 export type Project = {
   id: string;
   title: string;
   year: string;
   role: string;
   summary: string;
+  docs: ProjectDoc[];
   stages: Record<StageKey, ProjectStage>;
 };
 

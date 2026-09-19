@@ -2,6 +2,7 @@ import type { Portfolio } from "@/lib/types";
 import { projectHasContent } from "@/lib/portfolio";
 import { PhotoCollection } from "./PhotoGallery";
 import { Reveal } from "./Reveal";
+import { ProjectDocs } from "./ProjectDocs";
 import {
   ProfilePhoto,
   SectionLabel,
@@ -43,9 +44,8 @@ export function LilacStudio({
     <div
       className="lilac-studio relative min-h-screen overflow-hidden text-slate-800"
       style={{
-        ...themeVars(accent),
-        background:
-          "radial-gradient(720px 420px at 92% 0%, rgba(216,204,245,.85), transparent 55%), radial-gradient(480px 280px at 8% 8%, rgba(255,255,255,.95), transparent 50%), #f6f0fb",
+        ...themeVars(accent, "lilac-studio"),
+        background: `radial-gradient(720px 420px at 92% 0%, ${withAlpha(accent, 0.35)}, transparent 55%), radial-gradient(480px 280px at 8% 8%, rgba(255,255,255,.95), transparent 50%), var(--page)`,
       }}
     >
       <span className="ls-spark left-[46%] top-28 opacity-80" />
@@ -177,7 +177,7 @@ export function LilacStudio({
                     <img
                       src={cover.src}
                       alt={project.title}
-                      className="mb-3 h-28 w-full rounded-[1.2rem] object-cover"
+                      className="mb-3 aspect-[3/4] w-full rounded-[1.2rem] bg-violet-50 object-contain"
                     />
                   ) : (
                     <div
@@ -262,6 +262,7 @@ export function LilacStudio({
                       ))}
                     </div>
                   ) : null}
+                  <ProjectDocs project={project} />
                 </div>
                 <div className={`p-4 lg:col-span-8 ${index % 2 ? "lg:order-1" : ""}`}>
                   <PhotoCollection

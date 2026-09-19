@@ -18,6 +18,7 @@ export function createProject(): Project {
     year: "",
     role: "",
     summary: "",
+    docs: [],
     stages: {
       sketches: emptyStage(),
       process: emptyStage(),
@@ -62,6 +63,16 @@ export function createPortfolio(): Portfolio {
   };
 }
 
+export function moveItem<T extends { id: string }>(list: T[], fromId: string, toId: string) {
+  const from = list.findIndex((item) => item.id === fromId);
+  const to = list.findIndex((item) => item.id === toId);
+  if (from < 0 || to < 0 || from === to) return list;
+  const next = [...list];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
 export function slugify(value: string) {
   const base = value
     .normalize("NFD")
@@ -81,6 +92,7 @@ export function projectHasContent(project: Project) {
   return Boolean(
     project.title.trim() ||
       project.summary.trim() ||
+      (project.docs?.length ?? 0) > 0 ||
       hasStageContent(project.stages.sketches) ||
       hasStageContent(project.stages.process) ||
       hasStageContent(project.stages.final),
@@ -158,6 +170,20 @@ export const THEME_OPTIONS = [
     swatch: "bg-[linear-gradient(135deg,#1f5d6b,#174956)]",
     photoStyle: "editorial" as const,
   },
+  {
+    id: "social-press" as const,
+    name: "Prensa social",
+    description: "Revista beige de social media: casos, feed y formato vertical.",
+    swatch: "bg-[linear-gradient(135deg,#d7cdc3,#8a7d72)]",
+    photoStyle: "editorial" as const,
+  },
+  {
+    id: "burgundy-studio" as const,
+    name: "Estudio borgoña",
+    description: "Crema y vino. Editorial UX/UI con mosaico y grilla de trabajos.",
+    swatch: "bg-[linear-gradient(135deg,#f3eadb,#5c1a16)]",
+    photoStyle: "soft-card" as const,
+  },
 ];
 
 export const PHOTO_STYLE_OPTIONS = [
@@ -196,4 +222,6 @@ export const ACCENT_PRESETS: Record<Portfolio["appearance"]["themeId"], string[]
   "solar-pop": ["#FF6B3D", "#FF8A4A", "#F25C2C", "#FFB088", "#E85A2A"],
   "crimson-atelier": ["#F3D6A5", "#C9A36A", "#8B1E2D", "#E8C48A", "#6B1A28"],
   "teal-board": ["#1F5D6B", "#2A7384", "#174956", "#4AA0B0", "#0F3A44"],
+  "social-press": ["#8A7D72", "#5C534C", "#C4B8AE", "#3F3A36", "#A89888"],
+  "burgundy-studio": ["#5C1A16", "#7A2420", "#3D100E", "#C4A484", "#8B2E28"],
 };

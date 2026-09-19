@@ -40,5 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# published portfolios (local)
+# published portfolios and uploaded PDFs (local)
 /data/portfolios/*.json
+/data/docs/*.pdf
+/data/docs/*.json

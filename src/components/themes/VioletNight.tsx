@@ -1,7 +1,8 @@
 import type { Portfolio } from "@/lib/types";
 import { projectHasContent } from "@/lib/portfolio";
-import { PhotoCollection, DevicePreview } from "./PhotoGallery";
+import { PhotoCollection } from "./PhotoGallery";
 import { Reveal } from "./Reveal";
+import { ProjectDocs } from "./ProjectDocs";
 import {
   ProfilePhoto,
   SectionLabel,
@@ -23,11 +24,6 @@ export function VioletNight({
   const { profile, appearance, projects } = portfolio;
   const accent = appearance.accent;
   const visibleProjects = projects.filter(projectHasContent);
-  const featured =
-    visibleProjects[0]?.stages.final.images[0] ||
-    visibleProjects[0]?.stages.process.images[0] ||
-    visibleProjects[0]?.stages.sketches.images[0];
-  const phoneSrc = featured?.src || profile.photo;
   const socials = socialEntries(portfolio);
   const displayName = profile.name || "Tu nombre";
   const mark = initialsOf(displayName);
@@ -41,9 +37,8 @@ export function VioletNight({
     <div
       className="violet-night relative min-h-screen overflow-hidden text-violet-100"
       style={{
-        ...themeVars(accent),
-        background:
-          "radial-gradient(900px 520px at 85% -5%, rgba(168,85,247,.38), transparent 52%), radial-gradient(700px 420px at -10% 18%, rgba(88,28,135,.55), transparent 48%), linear-gradient(180deg, #080414 0%, #140824 40%, #090510 100%)",
+        ...themeVars(accent, "violet-night"),
+        background: `radial-gradient(900px 520px at 85% -5%, ${withAlpha(accent, 0.38)}, transparent 52%), radial-gradient(700px 420px at -10% 18%, ${withAlpha(accent, 0.22)}, transparent 48%), linear-gradient(180deg, var(--page) 0%, var(--page-2) 40%, var(--page) 100%)`,
       }}
     >
       <div className="vn-grid pointer-events-none absolute inset-0 opacity-50" />
@@ -157,13 +152,8 @@ export function VioletNight({
 
       <section
         id="sobre-mi"
-        className="relative z-[1] mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 lg:grid-cols-[220px_1fr]"
+        className="relative z-[1] mx-auto max-w-6xl px-6 py-16"
       >
-        {phoneSrc ? (
-          <DevicePreview src={phoneSrc} alt={displayName} accent={accent} />
-        ) : (
-          <div className="h-64 rounded-[2rem] border border-dashed border-white/15" />
-        )}
         <div>
           <h2 className="font-[family-name:var(--font-syne)] text-5xl tracking-tight">
             Sobre mí
@@ -253,6 +243,7 @@ export function VioletNight({
                       ))}
                     </div>
                   ) : null}
+                  <ProjectDocs project={project} />
                 </div>
                 <div className={`lg:col-span-8 ${index % 2 ? "lg:order-1" : ""}`}>
                   <PhotoCollection

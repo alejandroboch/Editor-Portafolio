@@ -1,15 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ACCENT_PRESETS,
   PHOTO_STYLE_OPTIONS,
   THEME_OPTIONS,
   createProject,
+  moveItem,
   prepareForPublish,
   slugify,
 } from "@/lib/portfolio";
 import { STAGE_META, type Portfolio } from "@/lib/types";
+import {
+  buildPalette,
+  normalizeHex,
+  paletteSwatches,
+} from "@/lib/palette";
 import {
   cachePublished,
   loadDraft,
@@ -19,6 +25,7 @@ import {
 } from "@/lib/draft";
 import { PortfolioView } from "@/components/themes/PortfolioView";
 import { ImageField } from "./ImageField";
+import { PdfField } from "./PdfField";
 
 type Tab = "perfil" | "estilo" | "proyectos" | "publicar" | "preview";
 
@@ -46,6 +53,7 @@ export function EditorApp() {
   const [status, setStatus] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const dragProjectId = useRef<string | null>(null);
 
   useEffect(() => {
     const draft = loadDraft();
@@ -338,7 +346,6 @@ export function EditorApp() {
                           appearance: {
                             ...portfolio.appearance,
                             themeId: theme.id,
-                            accent: ACCENT_PRESETS[theme.id][0],
                             photoStyle: theme.photoStyle,
                           },
                         })
@@ -390,6 +397,10 @@ export function EditorApp() {
                 </div>
                 <div>
                   <p className="mb-2 text-sm text-zinc-300">Color de acento</p>
+                  <p className="mb-3 text-xs leading-5 text-zinc-500">
+                    Elige un color. El resto de la paleta (fondos, textos y bloques)
+                    se arma sola para que combine con este diseño.
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {(
                       ACCENT_PRESETS[portfolio.appearance.themeId] ??
@@ -404,13 +415,18 @@ export function EditorApp() {
                             appearance: { ...portfolio.appearance, accent: color },
                           })
                         }
-                        className="h-9 w-9 rounded-full border border-white/20"
+                        className={`h-9 w-9 rounded-full border ${
+                          normalizeHex(portfolio.appearance.accent) ===
+                          normalizeHex(color)
+                            ? "border-white"
+                            : "border-white/20"
+                        }`}
                         style={{ background: color }}
                       />
                     ))}
                     <input
                       type="color"
-                      value={portfolio.appearance.accent}
+                      value={normalizeHex(portfolio.appearance.accent)}
                       onChange={(e) =>
                         update({
                           appearance: {
@@ -422,21 +438,62 @@ export function EditorApp() {
                       className="h-9 w-12 cursor-pointer rounded border-0 bg-transparent"
                     />
                   </div>
+                  <div className="mt-3 flex overflow-hidden rounded-xl border border-white/10">
+                    {paletteSwatches(
+                      buildPalette(
+                        portfolio.appearance.accent,
+                        portfolio.appearance.themeId,
+                      ),
+                    ).map((color) => (
+                      <span
+                        key={color}
+                        className="h-8 flex-1"
+                        style={{ background: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
                 </div>
               </>
             ) : null}
 
             {tab === "proyectos" ? (
               <div className="space-y-8">
+                <p className="text-xs text-zinc-500">
+                  Arrastra cada tarjeta para cambiar el orden de los proyectos.
+                  Dentro de cada etapa, arrastra las fotos; la primera destaca más.
+                </p>
                 {portfolio.projects.map((project, index) => (
                   <article
                     key={project.id}
                     className="rounded-2xl border border-white/10 p-4"
                   >
                     <div className="mb-4 flex items-center justify-between">
-                      <p className="text-sm text-zinc-400">
-                        Proyecto {index + 1}
-                      </p>
+                      <button
+                        type="button"
+                        draggable
+                        onDragStart={() => {
+                          dragProjectId.current = project.id;
+                        }}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          if (dragProjectId.current) {
+                            update({
+                              projects: moveItem(
+                                portfolio.projects,
+                                dragProjectId.current,
+                                project.id,
+                              ),
+                            });
+                          }
+                          dragProjectId.current = null;
+                        }}
+                        className="cursor-grab text-sm text-zinc-400 active:cursor-grabbing"
+                        title="Arrastra para reordenar el proyecto"
+                      >
+                        ⋮⋮ Proyecto {index + 1}
+                      </button>
                       {portfolio.projects.length > 1 ? (
                         <button
                           type="button"
@@ -508,6 +565,16 @@ export function EditorApp() {
                               item.id === project.id
                                 ? { ...item, summary: e.target.value }
                                 : item,
+                            ),
+                          })
+                        }
+                      />
+                      <PdfField
+                        docs={project.docs ?? []}
+                        onChange={(docs) =>
+                          update({
+                            projects: portfolio.projects.map((item) =>
+                              item.id === project.id ? { ...item, docs } : item,
                             ),
                           })
                         }

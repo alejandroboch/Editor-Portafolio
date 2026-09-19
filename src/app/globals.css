@@ -29,6 +29,14 @@ body {
   font-family: var(--font-outfit), sans-serif;
 }
 
+.social-press {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.burgundy-studio {
+  font-family: var(--font-cormorant), serif;
+}
+
 a {
   text-underline-offset: 3px;
 }

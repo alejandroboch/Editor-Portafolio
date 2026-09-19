@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces, Outfit, Syne, Playfair_Display, Bebas_Neue, Cormorant_Garamond } from "next/font/google";
+import { Great_Vibes, DM_Sans, Fraunces, Outfit, Syne, Playfair_Display, Bebas_Neue, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -34,6 +34,12 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "600", "700"],
 });
 
+const greatVibes = Great_Vibes({
+  variable: "--font-script",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
@@ -50,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="es"
       suppressHydrationWarning
-      className={`${outfit.variable} ${syne.variable} ${fraunces.variable} ${dmSans.variable} ${playfair.variable} ${bebas.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${outfit.variable} ${syne.variable} ${fraunces.variable} ${dmSans.variable} ${playfair.variable} ${bebas.variable} ${cormorant.variable} ${greatVibes.variable} h-full antialiased`}
     >
       <body className="min-h-full" suppressHydrationWarning>
         {children}
